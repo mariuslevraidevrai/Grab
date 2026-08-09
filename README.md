@@ -1,7 +1,7 @@
 # Grab
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/mariuslevraidevrai/grab/main/assets/grab.png" alt="Grab Banner" width="600"/>
+  <img src="https://github.com/mariuslevraidevrai/Grab/blob/main/grab.png" alt="Grab Banner" width="600"/>
 </p>
 
 <p align="center">
