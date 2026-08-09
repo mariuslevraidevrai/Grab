@@ -56,19 +56,19 @@ Here is a quick performance comparison downloading a **100 MB** file (e.g., OVH 
      make build
 
    * **Cross-Compilation for Specific Architectures:**
-     # Build 64-bit x86 binary
+     ## Build 64-bit x86 binary
      make build-amd64
 
-     # Build 32-bit x86 binary
+     ## Build 32-bit x86 binary
      make build-386
 
-     # Build ARM 64-bit binary (e.g., Raspberry Pi 64-bit, ARM servers)
+     ## Build ARM 64-bit binary (e.g., Raspberry Pi 64-bit, ARM servers)
      make build-arm64
 
-     # Build ARM 32-bit binary (e.g., older Raspberry Pi)
+     ## Build ARM 32-bit binary (e.g., older Raspberry Pi)
      make build-arm
 
-     # Build all architectures at once (output in ./build directory)
+     ## Build all architectures at once (output in ./build directory)
      make build-all
 
    * **Install Globally:**
