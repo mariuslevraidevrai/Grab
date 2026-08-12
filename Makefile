@@ -1,6 +1,6 @@
 BINARY_NAME=grab
 PREFIX?=/usr/local/bin
-VERSION?=v0.0.1
+VERSION?=v0.0.2
 BIN_DIR=bin
 
 LDFLAGS=-s -w -X main.Version=$(VERSION)
@@ -24,22 +24,22 @@ build:
 build-amd64:
 	@echo -e "$(COLOR_CYAN)-->$(COLOR_RESET) Building Linux x86_64 (amd64)..."
 	@mkdir -p $(BIN_DIR)
-	@GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$(BINARY_NAME)-linux-amd64 .
+	@GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$(BINARY_NAME)-amd64 .
 
 build-386:
 	@echo -e "$(COLOR_CYAN)-->$(COLOR_RESET) Building Linux x86 32-bit (386)..."
 	@mkdir -p $(BIN_DIR)
-	@GOOS=linux GOARCH=386 go build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$(BINARY_NAME)-linux-386 .
+	@GOOS=linux GOARCH=386 go build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$(BINARY_NAME)-386 .
 
 build-arm64:
 	@echo -e "$(COLOR_CYAN)-->$(COLOR_RESET) Building Linux ARM64..."
 	@mkdir -p $(BIN_DIR)
-	@GOOS=linux GOARCH=arm64 go build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$(BINARY_NAME)-linux-arm64 .
+	@GOOS=linux GOARCH=arm64 go build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$(BINARY_NAME)-arm64 .
 
 build-arm:
 	@echo -e "$(COLOR_CYAN)-->$(COLOR_RESET) Building Linux ARM 32-bit (armv7)..."
 	@mkdir -p $(BIN_DIR)
-	@GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$(BINARY_NAME)-linux-arm .
+	@GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$(BINARY_NAME)-arm .
 
 build-darwin-amd64:
 	@mkdir -p $(BIN_DIR)
@@ -62,14 +62,14 @@ install:
 	TARGET_BIN=""; \
 	if [ -f "$(BIN_DIR)/$(BINARY_NAME)" ]; then \
 		TARGET_BIN="$(BIN_DIR)/$(BINARY_NAME)"; \
-	elif [ "$$ARCH" = "x86_64" ] && [ -f "$(BIN_DIR)/$(BINARY_NAME)-linux-amd64" ]; then \
-		TARGET_BIN="$(BIN_DIR)/$(BINARY_NAME)-linux-amd64"; \
-	elif [ "$$ARCH" = "i386" -o "$$ARCH" = "i686" ] && [ -f "$(BIN_DIR)/$(BINARY_NAME)-linux-386" ]; then \
-		TARGET_BIN="$(BIN_DIR)/$(BINARY_NAME)-linux-386"; \
-	elif [ "$$ARCH" = "aarch64" -o "$$ARCH" = "arm64" ] && [ -f "$(BIN_DIR)/$(BINARY_NAME)-linux-arm64" ]; then \
-		TARGET_BIN="$(BIN_DIR)/$(BINARY_NAME)-linux-arm64"; \
-	elif [[ "$$ARCH" == arm* ]] && [ -f "$(BIN_DIR)/$(BINARY_NAME)-linux-arm" ]; then \
-		TARGET_BIN="$(BIN_DIR)/$(BINARY_NAME)-linux-arm"; \
+	elif [ "$$ARCH" = "x86_64" ] && [ -f "$(BIN_DIR)/$(BINARY_NAME)-amd64" ]; then \
+		TARGET_BIN="$(BIN_DIR)/$(BINARY_NAME)-amd64"; \
+	elif [ "$$ARCH" = "i386" -o "$$ARCH" = "i686" ] && [ -f "$(BIN_DIR)/$(BINARY_NAME)-386" ]; then \
+		TARGET_BIN="$(BIN_DIR)/$(BINARY_NAME)-386"; \
+	elif [ "$$ARCH" = "aarch64" -o "$$ARCH" = "arm64" ] && [ -f "$(BIN_DIR)/$(BINARY_NAME)-arm64" ]; then \
+		TARGET_BIN="$(BIN_DIR)/$(BINARY_NAME)-arm64"; \
+	elif [[ "$$ARCH" == arm* ]] && [ -f "$(BIN_DIR)/$(BINARY_NAME)-arm" ]; then \
+		TARGET_BIN="$(BIN_DIR)/$(BINARY_NAME)-arm"; \
 	fi; \
 	if [ -z "$$TARGET_BIN" ]; then \
 		echo -e "$(COLOR_YELLOW)[!]$(COLOR_RESET) No pre-built binary matching architecture ($$ARCH) found in $(BIN_DIR)/. Building native binary..."; \

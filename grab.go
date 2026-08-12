@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -16,16 +18,30 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
+const (
+	userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+	maxChunks = 32
+)
+
 var (
-	Version   = "v0.0.1"
+	Version   = "v0.0.2"
 	redText   = color.New(color.FgRed).SprintFunc()
 	greenText = color.New(color.FgGreen).SprintFunc()
 	cyanText  = color.New(color.FgCyan).SprintFunc()
 
 	httpClient = &http.Client{
 		Transport: &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			DialContext: (&net.Dialer{
+				Timeout:   15 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).DialContext,
+			TLSHandshakeTimeout:   15 * time.Second,
 			ResponseHeaderTimeout: 20 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
 			IdleConnTimeout:       30 * time.Second,
+			MaxIdleConnsPerHost:   maxChunks,
+			DisableCompression:    true,
 		},
 	}
 )
@@ -79,6 +95,9 @@ func main() {
 	if chunks <= 0 {
 		chunks = 4
 	}
+	if chunks > maxChunks {
+		chunks = maxChunks
+	}
 
 	defaultFileName := path.Base(parsedURL.Path)
 
@@ -100,36 +119,53 @@ func main() {
 		return
 	}
 
-	respond, err := httpClient.Head(targetURL)
+	req, err := http.NewRequest(http.MethodHead, targetURL, nil)
 	if err != nil {
-		fmt.Println(redText("[!]") + " Head request error:", err)
+		fmt.Println(redText("[!]") + " Request error:", err)
+		return
+	}
+	req.Header.Set("User-Agent", userAgent)
+
+	respond, err := httpClient.Do(req)
+	if err != nil {
+		fmt.Println(redText("[!]") + " Request error:", err)
 		return
 	}
 	statusCode := respond.StatusCode
 	statusText := respond.Status
-	acceptRanges := respond.Header.Get("Accept-Ranges")
 	contentLength := respond.Header.Get("Content-Length")
+	acceptRanges := respond.Header.Get("Accept-Ranges")
 	respond.Body.Close()
+
+	if statusCode == http.StatusMethodNotAllowed || statusCode == http.StatusNotImplemented {
+		fmt.Println("[" + cyanText("i") + "] HEAD not supported by server. Falling back to single-thread download...")
+		download(targetURL, finalPath)
+		return
+	}
 
 	if statusCode != http.StatusOK {
 		fmt.Printf("%s HTTP Error: %s\n", redText("[!]"), statusText)
 		return
 	}
 
-	if acceptRanges != "bytes" {
-		fmt.Println("[" + cyanText("i") + "] Server does not support parallel downloading. Falling back to single-thread...")
+	fileSize, err := strconv.ParseInt(contentLength, 10, 64)
+
+	if chunks == 1 || err != nil || fileSize <= 0 || acceptRanges != "bytes" {
+		if chunks > 1 && (err != nil || fileSize <= 0) {
+			fmt.Println("[" + cyanText("i") + "] Content-Length unknown. Falling back to single-thread download...")
+		} else if chunks > 1 && acceptRanges != "bytes" {
+			fmt.Println("[" + cyanText("i") + "] Server does not support range requests. Falling back to single-thread download...")
+		}
 		download(targetURL, finalPath)
 		return
 	}
 
-	fileSize, err := strconv.ParseInt(contentLength, 10, 64)
-	if err != nil || fileSize <= 0 {
-		fmt.Println(redText("[!]") + " Invalid file size:", err)
-		return
-	}
-
 	if int64(chunks) > fileSize {
-		chunks = 1
+		chunks = int(fileSize)
+	}
+	if chunks <= 1 {
+		download(targetURL, finalPath)
+		return
 	}
 
 	file, err := os.OpenFile(finalPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
@@ -163,6 +199,10 @@ func main() {
 	var barMutex sync.Mutex
 	errCh := make(chan error, chunks)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	var cancelOnce sync.Once
+
 	startTime := time.Now()
 
 	for i := 0; i < chunks; i++ {
@@ -174,22 +214,26 @@ func main() {
 		}
 
 		wg.Add(1)
-		go downloadByChunk(targetURL, start, end, file, bar, &wg, &completedChunks, chunks, errCh, &barMutex)
+		go downloadByChunk(ctx, targetURL, start, end, file, bar, &wg, &completedChunks, chunks, errCh, &barMutex)
 	}
 
-	wg.Wait()
-	close(errCh)
+	go func() {
+		wg.Wait()
+		close(errCh)
+	}()
 
 	failed := false
 	for e := range errCh {
 		if e != nil {
 			fmt.Println(redText("[!]") + " " + e.Error())
 			failed = true
+			cancelOnce.Do(cancel)
 		}
 	}
 
 	if failed {
 		fmt.Println(redText("[!]") + " Download failed, file may be incomplete or corrupted")
+		_ = os.Remove(finalPath)
 		return
 	}
 
