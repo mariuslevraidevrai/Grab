@@ -10,7 +10,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="License: MIT"/></a>
 </p>
 
-**Grab** is a fast, lightweight, and modern command-line file downloader written in Go 🔵. It accelerates downloads by splitting files into multiple chunks and downloading them concurrently using HTTP range requests.
+**Grab** is a fast, lightweight, and modern command-line file downloader written in Go.
 
 ---
 
@@ -106,10 +106,10 @@ grab https://example.com/file.zip
 
 #### Specify Output Directory or File Name
 Save the downloaded file directly to a specific folder or under a custom name:
-# Save to a directory
+## Save to a directory
 grab -o ~/Downloads https://example.com/file.zip
 
-# Save with a custom filename
+## Save with a custom filename
 grab -o ~/Downloads/custom_name.zip https://example.com/file.zip
 
 #### Custom Thread Count
@@ -122,10 +122,10 @@ grab -c 8 https://example.com/large-file.iso
 
 If installed via `make`, you can easily clean up or remove the global binary:
 
-# Remove build artifacts and build/ directory
+## Remove build artifacts and build/ directory
 make clean
 
-# Uninstall binary from /usr/local/bin
+## Uninstall binary from /usr/local/bin
 sudo make uninstall
 
 ---
