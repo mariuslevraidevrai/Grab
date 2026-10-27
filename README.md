@@ -14,18 +14,18 @@
 
 ---
 
-## ✨ Features
+## Features
 
-* **⚡ Fast Multi-Threaded Downloads:** Splits files into customizable chunks (`-c`) for maximum download speeds.
-* **🔄 Automatic Fallback:** Gracefully switches to single-threaded downloading if the target server does not support parallel range requests (`Accept-Ranges`).
-* **📊 Interactive CLI Progress Bar:** Real-time feedback displaying download speed, ETA, and progress rendered cleanly via `progressbar/v3`.
-* **🧠 Smart Path Resolution:** Automatically handles target output directories and custom file naming options.
-* **🪶 Lightweight Binary:** Stripped symbols and optimized compilation flag options (`-ldflags "-s -w"`) ensure a minimal footprint (~4MB).
-* **🖥️ Cross-Platform Compilation:** Built-in Makefile support for 32-bit x86, 64-bit amd64, ARM, and ARM64 architectures.
+* **Fast Multi-Threaded Downloads:** Splits files into customizable chunks (`-c`) for maximum download speeds.
+* **Automatic Fallback:** Gracefully switches to single-threaded downloading if the target server does not support parallel range requests (`Accept-Ranges`).
+* **Interactive CLI Progress Bar:** Real-time feedback displaying download speed, ETA, and progress rendered cleanly via `progressbar/v3`.
+* **Smart Path Resolution:** Automatically handles target output directories and custom file naming options.
+* **Lightweight Binary:** Stripped symbols and optimized compilation flag options (`-ldflags "-s -w"`) ensure a minimal footprint (~4MB).
+* **Cross-Platform Compilation:** Built-in Makefile support for 32-bit x86, 64-bit amd64, ARM, and ARM64 architectures.
 
 ---
 
-## ⚡ Benchmark
+## Benchmark
 
 Here is a quick performance comparison downloading a **100 MB** file (e.g., OVH test file):
 
@@ -36,13 +36,13 @@ Here is a quick performance comparison downloading a **100 MB** file (e.g., OVH 
 
 ---
 
-## 🛠️ Installation
+## Installation
 
 ### Prerequisites
 
-* **[Go](https://go.dev/)** 1.18 or higher 🐹
-* **Linux** / Unix environment (or WSL) 🐧
-* **`make`** (optional, for convenience) 🛠️
+* **[Go](https://go.dev/)** 1.18 or higher
+* **Linux** / Unix environment (or WSL)
+* **`make`** (optional, for convenience)
 
 ### Build from Source
 
@@ -79,7 +79,7 @@ Here is a quick performance comparison downloading a **100 MB** file (e.g., OVH 
 
 ---
 
-## 🚀 Usage
+## Usage
 
 grab [options] <URL>
 
@@ -98,7 +98,7 @@ grab -u <URL> -o <PATH> -c <CHUNKS>
 
 ---
 
-## 💡 Examples
+## Examples
 
 #### Basic Download
 Download a file to the current directory using 4 parallel threads:
@@ -118,7 +118,7 @@ grab -c 8 https://example.com/large-file.iso
 
 ---
 
-## 🧹 Uninstallation
+## Uninstallation
 
 If installed via `make`, you can easily clean up or remove the global binary:
 
@@ -130,6 +130,6 @@ sudo make uninstall
 
 ---
 
-## 📜 License
+## License
 
-Distributed under the **MIT License** 📄. See `LICENSE` for more information.
+Distributed under the **MIT License**. See `LICENSE` for more information.
